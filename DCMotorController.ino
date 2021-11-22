@@ -35,6 +35,7 @@ auto timer = timer_create_default();
 struct DRV8704{
   bool faults[6];
   uint8_t speedA,speedB;
+  uint8_t torque;
   uint8_t stateA, stateB;
 };
 
@@ -44,6 +45,8 @@ DRV8704 controller = {
    /* Set Default Speed of motors to 10% */
    .speedA = 25,
    .speedB = 25,
+   /* Default Torque */
+   .torque = 255,
    /* Default State of Motors */
    .stateA = STOP,
    .stateB = STOP
@@ -102,6 +105,16 @@ void setup() {
 
 
   /* Inititalize DRV8704 Parameters */
+  /* Enable Hbridge */
+  if (setHbridge("on")){
+    Serial.println("Enabled HBridge");
+  }
+  
+  if (setTorque(controller.torque)){
+    Serial.println("Set Torque Successful");
+  } else{
+    Serial.println("Set Torque Error ");
+  }
 }
 
 
@@ -271,6 +284,7 @@ void setMotors(DRV8704 *temp){
     default:
     break;
   }
+  setTorque(temp->torque);
   return true; // repeat? true
 }
 
@@ -757,38 +771,40 @@ void loop() {
   if (Serial.available()){
     ch = Serial.read();
     switch(ch){
+
+      /* Increase PWM value for Motor A */
       case 'i':
       case 'I':
-        /* Increase PWM value for Motor A */
         (controller.speedA <= 250)?  controller.speedA += 5 : controller.speedA = 255;
         Serial.print("SpeedA = ");
         Serial.println(controller.speedA);
       break;
 
+      /* Decrease PWM Value for Motor A */
       case 'k':
       case 'K':
-        /* Decrement PWM Value for Motor A */
         (controller.speedA >= 5)?  controller.speedA -= 5 : controller.speedA = 0;
         Serial.print("SpeedA = ");
         Serial.println(controller.speedA);
       break;
 
+      /* Increase PWM value for Motor B */
       case 'o':
       case 'O':
-        /* Increase PWM value for Motor B */
         (controller.speedB <= 250)?  controller.speedB += 5 : controller.speedB = 255;
         Serial.print("SpeedB = ");
         Serial.println(controller.speedB);
       break;
 
+      /* Decrease PWM Value for Motor B */
       case 'l':
       case 'L':
-        /* Decrement PWM Value for Motor B */
         (controller.speedB >= 5)?  controller.speedB -= 5 : controller.speedB = 0;
         Serial.print("SpeedB = ");
         Serial.println(controller.speedB);
       break;
 
+      /* Command to set state of Motor A */
       case 'q':
       case 'Q':
         controller.stateA = FORWARD;
@@ -807,6 +823,7 @@ void loop() {
         Serial.println("Motor A - BACKWARD");
       break;
 
+      /* Command to set state of Motor B */
       case 'w':
       case 'W':
         controller.stateB = FORWARD;
@@ -825,6 +842,7 @@ void loop() {
         Serial.println("Motor B - BACKWARD");
       break;
 
+      /* Enable And Disable H-Bridge */
       case 'j':
       case 'J':
         Serial.println("Disabling H-Bridge");
@@ -835,6 +853,21 @@ void loop() {
       case 'U':
         Serial.println("Enabling H-Bridge");
         setHbridge("on");
+      break;
+
+      /* Increment and Decrement value of Torque */
+      case 'y':
+      case 'Y':
+        (controller.torque <= 250)?  controller.torque += 5 : controller.torque = 255;
+        Serial.print("Torque  = ");
+        Serial.println(controller.torque);    
+      break;
+
+      case 'h':
+      case 'H':
+        (controller.torque >= 5)?  controller.torque -= 5 : controller.torque = 0;
+        Serial.print("Torque  = ");
+        Serial.println(controller.torque);
       break;
 
       default:
