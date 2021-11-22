@@ -792,31 +792,49 @@ void loop() {
       case 'q':
       case 'Q':
         controller.stateA = FORWARD;
+        Serial.println("Motor A - FORWARD");
       break;
 
       case 'a':
       case 'A':
         controller.stateA = STOP;
+        Serial.println("Motor A - STOP");
       break;
 
       case 'z':
       case 'Z':
         controller.stateA = BACK;
+        Serial.println("Motor A - BACKWARD");
       break;
 
       case 'w':
       case 'W':
         controller.stateB = FORWARD;
+        Serial.println("Motor B - FORWARD");
       break;
 
       case 's':
       case 'S':
         controller.stateB = STOP;
+        Serial.println("Motor B - STOP");
       break;
 
       case 'x':
       case 'X':
         controller.stateB = BACK;
+        Serial.println("Motor B - BACKWARD");
+      break;
+
+      case 'j':
+      case 'J':
+        Serial.println("Disabling H-Bridge");
+        setHbridge("off");
+      break;
+
+      case 'u':
+      case 'U':
+        Serial.println("Enabling H-Bridge");
+        setHbridge("on");
       break;
 
       default:
